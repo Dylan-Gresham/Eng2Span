@@ -2,6 +2,7 @@ import ast
 import os
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm
 
 from src.download_data import download_data
@@ -95,6 +96,25 @@ def process_data_files():
     big_df = pd.concat(dfs, ignore_index=True)
     big_df.drop_duplicates(inplace=True)
 
+    # Create 3 splits for train, validation, test
+    #
+    # Train = 60%
+    # Validation = 20%
+    # Test = 20%
+    train, test = train_test_split(big_df, test_size=0.2, random_state=42)
+    train, val = train_test_split(train, test_size=0.2, random_state=42)
+
+    train["split"] = "train"
+    val["split"] = "validation"
+    test["split"] = "test"
+
+    # Recombine the splits
+    cols = ["en", "es", "split"]
+    dfs = [df.reindex(columns=cols) for df in [train, val, test]]
+    big_df = pd.concat(dfs, ignore_index=True)
+
+    print(big_df.split.value_counts())
+
     return big_df
 
 
@@ -106,7 +126,7 @@ def process_all_data_files():
 
     - 'en': The source English
     - 'es': The expected Spanish translation
-    - 'split': The train/test/validation split that it was originally in
+    - 'split': Which of the train/validation/test splits that instance belongs to
     """
     download_data()
 
