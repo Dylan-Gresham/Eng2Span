@@ -177,3 +177,4 @@ cython_debug/
 ##### Project Specific #####
 pyproject.toml
 uv.lock
+.idea
