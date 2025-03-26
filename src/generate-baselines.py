@@ -1,5 +1,6 @@
 import evaluate
 import pandas as pd
+from tqdm.auto import tqdm
 from transformers import (
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
@@ -16,8 +17,9 @@ MODELS = [
     "facebook/nllb-200-distilled-600M",
 ]
 
+print("Reading in data")
 data = pd.read_csv("./data/combined.data")
-test_split = data.loc[data["split"] == "split"]
+test_split = data.loc[data["split"] == "test"]
 test_en = test_split["en"].to_list()
 references = test_split["es"].to_list()
 
@@ -27,6 +29,7 @@ def get_name_from_repo(repo_str):
     return repo_str.split("/")[1]
 
 
+print("Initializing baseline DataFrame for results")
 baselines = pd.DataFrame(
     columns=["BLEU", "METEOR", "ROUGE", "TER"],
     index=[get_name_from_repo(model) for model in MODELS],
@@ -105,7 +108,8 @@ def run_benchmarks_for(model_repo):
 
 
 def run_benchmarks():
-    for model in MODELS:
+    print("Running benchmarks")
+    for model in tqdm(MODELS, desc="Creating benchmarks for each model", leave=True):
         run_benchmarks_for(model)
 
 
