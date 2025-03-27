@@ -7,6 +7,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    NllbTokenizer,
 )
 
 MODEL_REPO = "facebook/nllb-200-distilled-600M"
@@ -30,7 +31,8 @@ data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+#tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer = NllbTokenizer.from_pretrained(MODEL_REPO, src_lang="eng_Latn", tgt_lang="spa_Latn")
 
 
 def preprocess_text(sample):

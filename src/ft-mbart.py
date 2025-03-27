@@ -7,6 +7,8 @@ from transformers import (
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    MBartTokenizer,
+    MBartForConditionalGeneration,
 )
 
 MODEL_REPO = "facebook/mbart-large-50"
@@ -30,12 +32,13 @@ data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+#tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer = MBartTokenizer.from_pretrained(MODEL_REPO, src_lang="en_XX", tgt_lang="es_XX")
 
 
 def preprocess_text(sample):
-    input = PREFIX_SRC + str(sample[0])
-    target = PREFIX_TGT + str(sample[1])
+    input = str(sample[0]) #PREFIX_SRC + str(sample[0])
+    target = str(sample[1]) #PREFIX_TGT + str(sample[1])
     return tokenizer(input, text_target=target, max_length=128, truncation=True)
 
 
