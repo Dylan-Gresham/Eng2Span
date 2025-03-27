@@ -95,6 +95,7 @@ def process_data_files():
     dfs = [df.reindex(columns=cols) for df in dfs]
     big_df = pd.concat(dfs, ignore_index=True)
     big_df.drop_duplicates(inplace=True)
+    big_df.dropna(how="any", ignore_index=True, inplace=True)
 
     # Create 3 splits for train, validation, test
     #
