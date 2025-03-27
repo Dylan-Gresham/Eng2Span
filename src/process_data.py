@@ -1,6 +1,7 @@
 import ast
 import os
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm
@@ -94,6 +95,7 @@ def process_data_files():
     cols = ["en", "es"]
     dfs = [df.reindex(columns=cols) for df in dfs]
     big_df = pd.concat(dfs, ignore_index=True)
+    big_df.replace('', np.nan, inplace=True)
     big_df.drop_duplicates(inplace=True)
     big_df.dropna(how="any", ignore_index=True, inplace=True)
 
