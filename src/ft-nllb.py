@@ -7,6 +7,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    NllbTokenizer,
 )
 
 MODEL_REPO = "facebook/nllb-200-distilled-600M"
@@ -30,7 +31,8 @@ data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+#tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer = NllbTokenizer.from_pretrained(MODEL_REPO, src_lang="eng_Latn", tgt_lang="spa_Latn")
 
 
 def preprocess_text(sample):
@@ -102,8 +104,8 @@ training_args = Seq2SeqTrainingArguments(
 trainer = Seq2SeqTrainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_train_data["train"],
-    eval_dataset=tokenized_test_data["test"],
+    train_dataset=tokenized_train_data,
+    eval_dataset=tokenized_test_data,
     processing_class=tokenizer,
     data_collator=data_collator,
     compute_metrics=compute_metrics,

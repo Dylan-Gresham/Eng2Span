@@ -7,11 +7,13 @@ from transformers import (
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    M2M100ForConditionalGeneration,
+    M2M100Tokenizer,
 )
 
 MODEL_REPO = "facebook/m2m100_418M"
-PREFIX_SRC = "__en__"
-PREFIX_TGT = "__es__"
+#PREFIX_SRC = "__en__"
+#PREFIX_TGT = "__es__"
 
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
@@ -30,12 +32,13 @@ data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+#tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer = M2M100Tokenizer.from_pretrained(MODEL_REPO, src_lang="en", tgt_lang="es")
 
 
 def preprocess_text(sample):
-    input = PREFIX_SRC + str(sample[0])
-    target = PREFIX_TGT + str(sample[1])
+    input = str(sample[0]) #PREFIX_SRC + str(sample[0])
+    target = str(sample[1]) #PREFIX_TGT + str(sample[1])
     return tokenizer(input, text_target=target, max_length=128, truncation=True)
 
 
@@ -82,8 +85,8 @@ def compute_metrics(eval_preds):
 
     return result
 
-
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)
+#model = M2M100ForConditionalGeneration.from_pretrained(MODEL_REPO)
 
 training_args = Seq2SeqTrainingArguments(
     output_dir="m2m100",
@@ -102,8 +105,8 @@ training_args = Seq2SeqTrainingArguments(
 trainer = Seq2SeqTrainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_train_data["train"],
-    eval_dataset=tokenized_test_data["test"],
+    train_dataset=tokenized_train_data,
+    eval_dataset=tokenized_test_data,
     processing_class=tokenizer,
     data_collator=data_collator,
     compute_metrics=compute_metrics,
