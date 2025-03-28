@@ -14,6 +14,8 @@ MODEL_REPO = "facebook/nllb-200-distilled-600M"
 PREFIX_SRC = "eng_Latn"
 PREFIX_TGT = "spa_Latn"
 
+print(f"MODEL: {MODEL_REPO}")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")

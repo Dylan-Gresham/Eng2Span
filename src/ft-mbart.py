@@ -15,6 +15,8 @@ MODEL_REPO = "facebook/mbart-large-50"
 PREFIX_SRC = "en_XX"
 PREFIX_TGT = "es_XX"
 
+print(f"MODEL: {MODEL_REPO}")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")

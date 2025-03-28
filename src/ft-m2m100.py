@@ -15,6 +15,8 @@ MODEL_REPO = "facebook/m2m100_418M"
 #PREFIX_SRC = "__en__"
 #PREFIX_TGT = "__es__"
 
+print(f"MODEL: {MODEL_REPO}")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")

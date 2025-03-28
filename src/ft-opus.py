@@ -12,6 +12,8 @@ from transformers import (
 MODEL_REPO = "Helsinki-NLP/opus-mt-en-es"
 # PREFIX = "translate English to Spanish: "
 
+print(f"MODEL: {MODEL_REPO}")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")
