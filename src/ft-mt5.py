@@ -14,7 +14,7 @@ PREFIX = "translate English to Spanish: "
 
 print(f"MODEL: {MODEL_REPO}")
 
-#accuracy = evaluate.load("accuracy")
+accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")
 meteor = evaluate.load("meteor")
