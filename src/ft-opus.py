@@ -70,6 +70,12 @@ def compute_metrics(eval_preds):
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
 
+    # debug stuff...
+    print("decoded_preds type:", type(decoded_preds))
+    print("decoded_preds:", decoded_preds[0] if decoded_preds else None)
+    print("decoded_labels type:", type(decoded_labels))
+    print("decoded_labels:", decoded_labels[0] if decoded_labels else None)
+
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
         result = {name: result["score"]}
