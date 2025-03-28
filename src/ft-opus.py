@@ -72,28 +72,29 @@ def compute_metrics(eval_preds):
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
 
+    results = {}
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
         if name == "BLEU":
             # BLEU result structure {'bleu': 0.0, 'precisions': [0.0, ..., 0.0], 'brevity_penalty': 0.0, 'length_ratio': 0.0, 'transition_length': 0, 'reference_length': 0}
-            result = {name: result["bleu"]}
+            results[name] = result["bleu"]
         elif name == "ROUGE":
             # ROUGE result structure {'rouge1': 0.0, 'rouge2': 0.0, 'rougeL': 0.0, 'rougeLsum': 0.0}
-            result = {name: result["rougeL"]}
+            results[name] = result["rougeL"]
         elif name == "METEOR":
             # METEOR result structure {'meteor': 0.0}
-            result = {name: result["meteor"]}
+            results[name] = result["meteor"]
         elif name == "TER":
             # TER results structure {'score': 0.0, 'num_edits': 0, 'ref_length': 0.0}
-            result = {name: result["score"]}
+            results[name] = result["score"]
 
     prediction_lens = [
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
     ]
-    result["gen_len"] = np.mean(prediction_lens)
-    result = {k: round(v, 4) for k, v in result.items()}
+    results["gen_len"] = np.mean(prediction_lens)
+    results = {k: round(v, 4) for k, v in result.items()}
 
-    return result
+    return results
 
 
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)
