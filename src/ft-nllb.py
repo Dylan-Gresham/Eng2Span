@@ -14,7 +14,7 @@ MODEL_REPO = "facebook/nllb-200-distilled-600M"
 PREFIX_SRC = "eng_Latn"
 PREFIX_TGT = "spa_Latn"
 
-print(f"MODEL: {MODEL_REPO}")
+print(f"MODEL_REPO: {MODEL_REPO}\n")
 
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
@@ -73,18 +73,28 @@ def compute_metrics(eval_preds):
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-
+    
+    results = {}
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
-        result = {name: result["score"]}
+        if name == "BLEU":
+            results[name] = result["bleu"]
+        elif name == "ROUGE":
+            results[name] = result["rougeL"]
+        elif name == "METEOR":
+            results[name] = result["meteor"]
+        elif name = "TER":
+            results[name] = result["score"]
 
     prediction_lens = [
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
     ]
-    result["gen_len"] = np.mean(prediction_lens)
-    result = {k: round(v, 4) for k, v in result.items()}
+    results["gen_len"] = np.mean(prediction_lens)
+    results = {k: round(v, 4) for k, v in results.items()}
 
-    return result
+    print(f"results: {results}\n")
+
+    return results
 
 
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)

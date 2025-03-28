@@ -12,7 +12,7 @@ from transformers import (
 MODEL_REPO = "Helsinki-NLP/opus-mt-en-es"
 # PREFIX = "translate English to Spanish: "
 
-print(f"MODEL: {MODEL_REPO}")
+print(f"MODEL_REPO: {MODEL_REPO}\n")
 
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
@@ -92,7 +92,9 @@ def compute_metrics(eval_preds):
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
     ]
     results["gen_len"] = np.mean(prediction_lens)
-    results = {k: round(v, 4) for k, v in result.items()}
+    results = {k: round(v, 4) for k, v in results.items()}
+
+    print(f"results: {results}\n")
 
     return results
 
