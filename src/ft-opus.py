@@ -20,7 +20,7 @@ rouge = evaluate.load("rouge")
 meteor = evaluate.load("meteor")
 ter = evaluate.load("ter")
 METRICS = [
-    ("Accuracy", accuracy),
+#    ("Accuracy", accuracy),
     ("BLEU", bleu),
     ("ROUGE", rouge),
     ("METEOR", meteor),
