@@ -27,8 +27,6 @@ METRICS = [
 
 data = pd.read_csv("./data/combined.data")
 
-print(f"data: {data}\n")
-
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
