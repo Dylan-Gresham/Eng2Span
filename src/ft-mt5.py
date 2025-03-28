@@ -12,18 +12,7 @@ from transformers import (
 MODEL_REPO = "google/mT5-small"
 PREFIX = "translate English to Spanish: "
 
-accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
-rouge = evaluate.load("rouge")
-meteor = evaluate.load("meteor")
-ter = evaluate.load("ter")
-METRICS = [
-    ("Accuracy", accuracy),
-    ("BLEU", bleu),
-    ("ROUGE", rouge),
-    ("METEOR", meteor),
-    ("TER", ter),
-]
 
 data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
@@ -69,9 +58,8 @@ def compute_metrics(eval_preds):
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
 
-    for name, metric in METRICS:
-        result = metric.compute(predictions=decoded_preds, references=decoded_labels)
-        result = {name: result["score"]}
+    result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
+    result = result["score"]
 
     prediction_lens = [
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
