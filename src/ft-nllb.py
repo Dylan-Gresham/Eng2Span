@@ -24,9 +24,9 @@ ter = evaluate.load("ter")
 METRICS = [
     ("Accuracy", accuracy),
     ("BLEU", bleu),
-#    ("ROUGE", rouge),
-#    ("METEOR", meteor),
-#    ("TER", ter),
+    ("ROUGE", rouge),
+    ("METEOR", meteor),
+    ("TER", ter),
 ]
 
 data = pd.read_csv("./data/combined.data")
