@@ -83,7 +83,7 @@ def compute_metrics(eval_preds):
             results[name] = result["rougeL"]
         elif name == "METEOR":
             results[name] = result["meteor"]
-        elif name = "TER":
+        elif name == "TER":
             results[name] = result["score"]
 
     prediction_lens = [
