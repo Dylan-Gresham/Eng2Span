@@ -106,7 +106,7 @@ training_args = Seq2SeqTrainingArguments(
     save_total_limit=3,
     num_train_epochs=3,
     predict_with_generate=True,
-    fp16=True,
+    fp16=False, # internet reported issues with this causing problems when true
     push_to_hub=False,
 )
 
