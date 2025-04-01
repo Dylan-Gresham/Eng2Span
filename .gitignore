@@ -176,3 +176,6 @@ cython_debug/
 
 ##### Project Specific #####
 .idea
+
+data
+data/*
