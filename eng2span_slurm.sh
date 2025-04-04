@@ -23,13 +23,11 @@ nvidia-smi
 
 # activate engironment
 . ~/.bashrc
-conda activate py39 # replace with a joint conda environment
-                    # this one is just python 3.9 from conda tutorial
+conda activate eng2span # replace with a joint conda environment
 
 # load module
 module load cudnn8.0-cuda11.0/8.0.5.39 # to use GPU cuda stuff
 
-
 # run script
-python pretraining.py # replace with script
+python src/ft-opus.py # replace with script
 

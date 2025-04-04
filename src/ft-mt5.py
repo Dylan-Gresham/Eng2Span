@@ -12,17 +12,19 @@ from transformers import (
 MODEL_REPO = "google/mT5-small"
 PREFIX = "translate English to Spanish: "
 
+print(f"MODEL_REPO: {MODEL_REPO}\n")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")
 meteor = evaluate.load("meteor")
 ter = evaluate.load("ter")
 METRICS = [
-    ("Accuracy", accuracy),
-    ("BLEU", bleu),
-    ("ROUGE", rouge),
-    ("METEOR", meteor),
-    ("TER", ter),
+#        ("Accuracy", accuracy),
+        ("BLEU", bleu),
+        ("ROUGE", rouge),
+        ("METEOR", meteor),
+        ("TER", ter),
 ]
 
 data = pd.read_csv("./data/combined.data")
@@ -68,18 +70,28 @@ def compute_metrics(eval_preds):
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-
+    
+    results = {}
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
-        result = {name: result["score"]}
+        if name == "BLEU":
+            results[name] = result["bleu"]
+        elif name == "ROUGE":
+            results[name] = result["rougeL"]
+        elif name == "METEOR":
+            results[name] = result["meteor"]
+        elif name == "TER":
+            results[name] = result["score"]
 
     prediction_lens = [
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
     ]
-    result["gen_len"] = np.mean(prediction_lens)
-    result = {k: round(v, 4) for k, v in result.items()}
+    results["gen_len"] = np.mean(prediction_lens)
+    results = {k: round(v, 4) for k, v in results.items()}
 
-    return result
+    print(f"results: {results}\n")
+
+    return results
 
 
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)
@@ -94,15 +106,15 @@ training_args = Seq2SeqTrainingArguments(
     save_total_limit=3,
     num_train_epochs=3,
     predict_with_generate=True,
-    fp16=True,
+    fp16=False, # internet reported issues with this causing problems when true
     push_to_hub=False,
 )
 
 trainer = Seq2SeqTrainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_train_data["train"],
-    eval_dataset=tokenized_test_data["test"],
+    train_dataset=tokenized_train_data,
+    eval_dataset=tokenized_test_data,
     processing_class=tokenizer,
     data_collator=data_collator,
     compute_metrics=compute_metrics,

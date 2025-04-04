@@ -12,13 +12,15 @@ from transformers import (
 MODEL_REPO = "Helsinki-NLP/opus-mt-en-es"
 # PREFIX = "translate English to Spanish: "
 
+print(f"MODEL_REPO: {MODEL_REPO}\n")
+
 accuracy = evaluate.load("accuracy")
 bleu = evaluate.load("bleu")
 rouge = evaluate.load("rouge")
 meteor = evaluate.load("meteor")
 ter = evaluate.load("ter")
 METRICS = [
-    ("Accuracy", accuracy),
+#    ("Accuracy", accuracy),
     ("BLEU", bleu),
     ("ROUGE", rouge),
     ("METEOR", meteor),
@@ -26,6 +28,7 @@ METRICS = [
 ]
 
 data = pd.read_csv("./data/combined.data")
+
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
@@ -69,17 +72,31 @@ def compute_metrics(eval_preds):
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
 
+    results = {}
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
-        result = {name: result["score"]}
+        if name == "BLEU":
+            # BLEU result structure {'bleu': 0.0, 'precisions': [0.0, ..., 0.0], 'brevity_penalty': 0.0, 'length_ratio': 0.0, 'transition_length': 0, 'reference_length': 0}
+            results[name] = result["bleu"]
+        elif name == "ROUGE":
+            # ROUGE result structure {'rouge1': 0.0, 'rouge2': 0.0, 'rougeL': 0.0, 'rougeLsum': 0.0}
+            results[name] = result["rougeL"]
+        elif name == "METEOR":
+            # METEOR result structure {'meteor': 0.0}
+            results[name] = result["meteor"]
+        elif name == "TER":
+            # TER results structure {'score': 0.0, 'num_edits': 0, 'ref_length': 0.0}
+            results[name] = result["score"]
 
     prediction_lens = [
         np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
     ]
-    result["gen_len"] = np.mean(prediction_lens)
-    result = {k: round(v, 4) for k, v in result.items()}
+    results["gen_len"] = np.mean(prediction_lens)
+    results = {k: round(v, 4) for k, v in results.items()}
 
-    return result
+    print(f"results: {results}\n")
+
+    return results
 
 
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)
@@ -88,8 +105,8 @@ training_args = Seq2SeqTrainingArguments(
     output_dir="opus",
     eval_strategy="epoch",
     learning_rate=2e-5,
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
     weight_decay=0.01,
     save_total_limit=3,
     num_train_epochs=3,
