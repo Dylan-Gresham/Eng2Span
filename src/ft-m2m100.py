@@ -3,17 +3,15 @@ import numpy as np
 import pandas as pd
 from transformers import (
     AutoModelForSeq2SeqLM,
-    AutoTokenizer,
     DataCollatorForSeq2Seq,
+    M2M100Tokenizer,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
-    M2M100ForConditionalGeneration,
-    M2M100Tokenizer,
 )
 
 MODEL_REPO = "facebook/m2m100_418M"
-#PREFIX_SRC = "__en__"
-#PREFIX_TGT = "__es__"
+# PREFIX_SRC = "__en__"
+# PREFIX_TGT = "__es__"
 
 print(f"MODEL_REPO: {MODEL_REPO}\n")
 
@@ -23,7 +21,7 @@ rouge = evaluate.load("rouge")
 meteor = evaluate.load("meteor")
 ter = evaluate.load("ter")
 METRICS = [
-#    ("Accuracy", accuracy),
+    #    ("Accuracy", accuracy),
     ("BLEU", bleu),
     ("ROUGE", rouge),
     ("METEOR", meteor),
@@ -34,13 +32,13 @@ data = pd.read_csv("./data/combined.data")
 train = data.loc[data["split"] != "test"]
 test = data.loc[data["split"] == "test"]
 
-#tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
 tokenizer = M2M100Tokenizer.from_pretrained(MODEL_REPO, src_lang="en", tgt_lang="es")
 
 
 def preprocess_text(sample):
-    input = str(sample[0]) #PREFIX_SRC + str(sample[0])
-    target = str(sample[1]) #PREFIX_TGT + str(sample[1])
+    input = str(sample[0])  # PREFIX_SRC + str(sample[0])
+    target = str(sample[1])  # PREFIX_TGT + str(sample[1])
     return tokenizer(input, text_target=target, max_length=128, truncation=True)
 
 
@@ -74,7 +72,7 @@ def compute_metrics(eval_preds):
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-    
+
     results = {}
     for name, metric in METRICS:
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
@@ -97,8 +95,9 @@ def compute_metrics(eval_preds):
 
     return results
 
+
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO)
-#model = M2M100ForConditionalGeneration.from_pretrained(MODEL_REPO)
+# model = M2M100ForConditionalGeneration.from_pretrained(MODEL_REPO)
 
 training_args = Seq2SeqTrainingArguments(
     output_dir="m2m100",

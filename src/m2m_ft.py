@@ -1,3 +1,6 @@
+import os
+import sys
+
 import evaluate
 import pandas as pd
 import torch
@@ -14,7 +17,6 @@ meteor = evaluate.load("meteor")
 rouge = evaluate.load("rouge")
 ter = evaluate.load("ter")
 
-print("Reading in data")
 data = pd.read_csv("./data/combined.data")
 test_split = data.loc[data["split"] == "test"]
 test_en = test_split["en"].to_list()
@@ -23,43 +25,45 @@ references = test_split["es"].to_list()
 references = [str(e) for e in references]
 
 
-print("Initializing baseline DataFrame for results")
 results = pd.DataFrame(
     columns=["BLEU", "METEOR", "ROUGE", "TER"],
     index=[],
 )
 
-m2m_tokenizer = M2M100Tokenizer.from_pretrained(
+tokenizer = M2M100Tokenizer.from_pretrained(
     "facebook/m2m100_418M", src_lang="en", tgt_lang="es"
 )
 
 
-def translate_batched_m2m(m2m_model, en_sentences, batch_size=8):
+def translate_batched(model, en_sentences, position, batch_size=8):
     translations = []
+    os.system("clear")
     for i in tqdm(
-        range(0, len(en_sentences), batch_size), desc="Generating M2M100 translations"
+        range(0, len(en_sentences), batch_size),
+        desc="Generating M2M translations",
+        position=position,
     ):
-        encoded = m2m_tokenizer(
+        encoded = tokenizer(
             en_sentences[i : i + batch_size],
             return_tensors="pt",
             padding=True,
             truncation=True,
         ).to(device)
-        generated_tokens = m2m_model.generate(
-            **encoded, forced_bos_token_id=m2m_tokenizer.get_lang_id("es")
+        generated_tokens = model.generate(
+            **encoded, forced_bos_token_id=tokenizer.get_lang_id("es")
         ).to("cpu")
         translations.extend(
-            m2m_tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+            tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
         )
 
     return translations
 
 
-def evaluate_m2m():
-    m2m_model = AutoModelForSeq2SeqLM.from_pretrained(
+def evaluate(position):
+    model = AutoModelForSeq2SeqLM.from_pretrained(
         "models/m2m100", local_files_only=True
     )
-    translations = translate_batched_m2m(m2m_model, test_en)
+    translations = translate_batched(model, test_en, position)
 
     bleu_result = bleu.compute(predictions=translations, references=references)["bleu"]
     meteor_result = meteor.compute(predictions=translations, references=references)[
@@ -77,10 +81,15 @@ def evaluate_m2m():
     }
 
 
-def run_benchmarks():
-    evaluate_m2m()
+def run_benchmarks(position):
+    evaluate(position)
 
 
 if __name__ == "__main__":
-    run_benchmarks()
+    if len(sys.argv) < 2:
+        print(f"Usage: python {str(sys.argv[0])} <position>")
+        exit(1)
+
+    run_benchmarks(int(sys.argv[1]))
+
     results.to_csv("data/m2m_ft.csv", index=False)

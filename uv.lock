@@ -481,6 +481,7 @@ dependencies = [
     { name = "requests" },
     { name = "rouge-score" },
     { name = "sacrebleu" },
+    { name = "sacremoses" },
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "sentencepiece" },
@@ -504,6 +505,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rouge-score", specifier = ">=0.1.2" },
     { name = "sacrebleu", specifier = ">=2.5.1" },
+    { name = "sacremoses", specifier = ">=0.1.1" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "sentencepiece", specifier = ">=0.2.0" },
@@ -2231,6 +2233,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/01/14/8526cf8a5b912b618e7d6ed319a5b1876788bebba1f9a660e1291832c1cc/sacrebleu-2.5.1.tar.gz", hash = "sha256:1a088cc1c74ffaff0759c3191a85db09eecfa7a52e09be244e319d8d64e2fb11", size = 1896900 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cd/45/7b55a7bd7e5c5b573b40ad58ba43fa09962dc5c8d71b1f573d4aeaa54a7e/sacrebleu-2.5.1-py3-none-any.whl", hash = "sha256:7c9f7ee75bec3a5bf19dd87112dfd654952130e403ad30c48298fb7da3212d5d", size = 104107 },
+]
+
+[[package]]
+name = "sacremoses"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "joblib" },
+    { name = "regex" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/51/fbdc4af4f6e85d26169e28be3763fe50ddfd0d4bf8b871422b0788dcc4d2/sacremoses-0.1.1.tar.gz", hash = "sha256:b6fd5d3a766b02154ed80b962ddca91e1fd25629c0978c7efba21ebccf663934", size = 883188 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/f0/89ee2bc9da434bd78464f288fdb346bc2932f2ee80a90b2a4bbbac262c74/sacremoses-0.1.1-py3-none-any.whl", hash = "sha256:31e04c98b169bfd902144824d191825cd69220cdb4ae4bcf1ec58a7db5587b1a", size = 897476 },
 ]
 
 [[package]]

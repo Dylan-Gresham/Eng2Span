@@ -1,3 +1,6 @@
+import os
+import sys
+
 import evaluate
 import pandas as pd
 import torch
@@ -14,7 +17,6 @@ meteor = evaluate.load("meteor")
 rouge = evaluate.load("rouge")
 ter = evaluate.load("ter")
 
-print("Reading in data")
 data = pd.read_csv("./data/combined.data")
 test_split = data.loc[data["split"] == "test"]
 test_en = test_split["en"].to_list()
@@ -23,7 +25,6 @@ references = test_split["es"].to_list()
 references = [str(e) for e in references]
 
 
-print("Initializing baseline DataFrame for results")
 results = pd.DataFrame(
     columns=["BLEU", "METEOR", "ROUGE", "TER"],
     index=[],
@@ -32,10 +33,13 @@ results = pd.DataFrame(
 tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-es")
 
 
-def translate_batched(model, en_sentences, batch_size=8):
+def translate_batched(model, en_sentences, position, batch_size=8):
     translations = []
+    os.system("clear")
     for i in tqdm(
-        range(0, len(en_sentences), batch_size), desc="Generating Opus translations"
+        range(0, len(en_sentences), batch_size),
+        desc="Generating Opus translations",
+        position=position,
     ):
         encoded = tokenizer(
             en_sentences[i : i + batch_size],
@@ -43,9 +47,7 @@ def translate_batched(model, en_sentences, batch_size=8):
             padding=True,
             truncation=True,
         ).to(device)
-        generated_tokens = model.generate(
-            **encoded, forced_bos_token_id=tokenizer.get_lang_id("es")
-        ).to("cpu")
+        generated_tokens = model.generate(**encoded).to("cpu")
         translations.extend(
             tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
         )
@@ -53,11 +55,11 @@ def translate_batched(model, en_sentences, batch_size=8):
     return translations
 
 
-def evaluate():
+def evaluate(position):
     model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-es").to(
         device
     )
-    translations = translate_batched(model, test_en)
+    translations = translate_batched(model, test_en, position)
 
     bleu_result = bleu.compute(predictions=translations, references=references)["bleu"]
     meteor_result = meteor.compute(predictions=translations, references=references)[
@@ -75,10 +77,15 @@ def evaluate():
     }
 
 
-def run_benchmarks():
-    evaluate()
+def run_benchmarks(position):
+    evaluate(position)
 
 
 if __name__ == "__main__":
-    run_benchmarks()
+    if len(sys.argv) < 2:
+        print(f"Usage: python {str(sys.argv[0])} <position>")
+        exit(1)
+
+    run_benchmarks(int(sys.argv[1]))
+
     results.to_csv("data/opus_ft.csv", index=False)
