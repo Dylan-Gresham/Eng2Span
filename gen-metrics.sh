@@ -1,29 +1,29 @@
 #!/bin/bash
 
 if [ "$(hostname)" == "ENG402758" ]; then
-    # echo "Generating baseline scores..."
-    #
-    # uv run src/m2m_baseline.py 0 &
-    # uv run src/mbart_baseline.py 1 &
-    # uv run src/nllb_baseline.py 2 &
-    # uv run src/opus_baseline.py 3 &
-    #
-    # wait
-    #
-    # echo "Baseline scores generated!"
+    echo "Generating baseline scores..."
 
-    # echo "Generating fine-tuned scores..."
-    #
-    # uv run src/m2m_ft.py 0 &
-    # uv run src/mbart_ft.py 1 &
-    # uv run src/nllb_ft.py 2 &
-    # uv run src/opus_ft.py 3 &
-    #
-    # wait
-    #
-    # echo "Fine-tuned scores generated!"
-    #
-    # uv run src/join_eval_metrics.py
+    uv run src/m2m_baseline.py 0 &
+    uv run src/mbart_baseline.py 1 &
+    uv run src/nllb_baseline.py 2 &
+    uv run src/opus_baseline.py 3 &
+
+    wait
+
+    echo "Baseline scores generated!"
+
+    echo "Generating fine-tuned scores..."
+
+    uv run src/m2m_ft.py 0 &
+    uv run src/mbart_ft.py 1 &
+    uv run src/nllb_ft.py 2 &
+    uv run src/opus_ft.py 3 &
+
+    wait
+
+    echo "Fine-tuned scores generated!"
+
+    uv run src/join_eval_metrics.py
 
     echo "Results:"
 
