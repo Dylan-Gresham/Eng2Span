@@ -90,4 +90,4 @@ if __name__ == "__main__":
 
     run_benchmarks(int(sys.argv[1]))
 
-    results.to_csv("data/m2m_baseline.csv", index=False)
+    results.to_csv("data/m2m_baseline.csv")

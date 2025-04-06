@@ -40,7 +40,7 @@ def translate_batched(model, en_sentences, position, batch_size=8):
     os.system("clear")
     for i in tqdm(
         range(0, len(en_sentences), batch_size),
-        desc="Generating M2M translations",
+        desc="Generating M2M FT translations",
         position=position,
     ):
         encoded = tokenizer(
@@ -62,7 +62,7 @@ def translate_batched(model, en_sentences, position, batch_size=8):
 def evaluate(position):
     model = AutoModelForSeq2SeqLM.from_pretrained(
         "models/m2m100", local_files_only=True
-    )
+    ).to(device)
     translations = translate_batched(model, test_en, position)
 
     bleu_result = bleu.compute(predictions=translations, references=references)["bleu"]
@@ -92,4 +92,4 @@ if __name__ == "__main__":
 
     run_benchmarks(int(sys.argv[1]))
 
-    results.to_csv("data/m2m_ft.csv", index=False)
+    results.to_csv("data/m2m_ft.csv")

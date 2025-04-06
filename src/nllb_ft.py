@@ -40,7 +40,7 @@ def translate_batched(model, en_sentences, position, batch_size=8):
     os.system("clear")
     for i in tqdm(
         range(0, len(en_sentences), batch_size),
-        desc="Generating NLLB translations",
+        desc="Generating NLLB FT translations",
         position=position,
     ):
         encoded = tokenizer(
@@ -62,7 +62,7 @@ def translate_batched(model, en_sentences, position, batch_size=8):
 
 def evaluate(position):
     model = AutoModelForSeq2SeqLM.from_pretrained(
-        "facebook/nllb-200-distilled-600M"
+        "models/nllb", local_files_only=True
     ).to(device)
     translations = translate_batched(model, test_en, position)
 
@@ -93,4 +93,4 @@ if __name__ == "__main__":
 
     run_benchmarks(int(sys.argv[1]))
 
-    results.to_csv("data/nllb_baseline.csv", index=False)
+    results.to_csv("data/nllb_ft.csv")
