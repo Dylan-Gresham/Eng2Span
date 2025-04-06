@@ -8,9 +8,9 @@ if [ "$(hostname)" == "ENG402758" ]; then
     uv run src/nllb_baseline.py 2 &
     uv run src/opus_baseline.py 3 &
 
-    echo "Baseline scores generated!"
-
     wait
+
+    echo "Baseline scores generated!"
 
     echo "Generating fine-tuned scores..."
 
