@@ -6,7 +6,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-MODEL_REPO = "models/opus"
+MODEL_REPO = "models/mbart"
 
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO, local_files_only=True).to(
     device
