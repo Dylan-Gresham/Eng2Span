@@ -1,4 +1,5 @@
 import tkinter as tk
+import seaborn as sns
 
 class App(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -17,9 +18,12 @@ class App(tk.Frame):
             translated_text = text
             
             spanishText.config(state="normal") # unlock text box
-            
-            spanishText.insert(tk.END, translated_text)
-            
+
+            ii = 0 
+            for word in translated_text:
+                spanishText.insert(tk.END, word, f"{ii % len(palette)}")
+                ii += 1
+                
             spanishText.config(state="disabled") # lock text box
 
         # components
@@ -33,8 +37,12 @@ class App(tk.Frame):
         spanishText.config(state="disabled")
 
         # setup tags for colored text
-        spanishText.tag_config("0", foreground="red") # ???
-        
+        palette = sns.color_palette("flare").as_hex()
+        for ii in range(len(palette)):
+            # print(palette[ii])
+            spanishText.tag_config(f"{ii}", foreground=palette[ii])
+
+        spanishText.tag_config("!", foreground="red")
         
         # how stuff will be layed out
         englishLabel.pack()
