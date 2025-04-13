@@ -16,13 +16,16 @@ class App(tk.Frame):
             print("english text entered:", text)
             print("trigger translation...")
             translated_text = text
-            
-            spanishText.config(state="normal") # unlock text box
 
+            
+            spanishText.config(state="normal") # unlock text box, must do before able to change things in it (people can type in it when unlocked)
+            spanishText.delete("1.0", tk.END) # delete previous text
+            
             ii = 0 
             for word in translated_text:
                 spanishText.insert(tk.END, word, f"{ii % len(palette)}")
                 ii += 1
+                # use a switch statement to assign colors to text (note this does not go word by word rn)
                 
             spanishText.config(state="disabled") # lock text box
 
@@ -37,12 +40,11 @@ class App(tk.Frame):
         spanishText.config(state="disabled")
 
         # setup tags for colored text
-        palette = sns.color_palette("flare").as_hex()
+        palette = sns.color_palette("viridis_r", 10).as_hex()
         for ii in range(len(palette)):
             # print(palette[ii])
             spanishText.tag_config(f"{ii}", foreground=palette[ii])
-
-        spanishText.tag_config("!", foreground="red")
+        print("num colors:",len(palette))
         
         # how stuff will be layed out
         englishLabel.pack()
