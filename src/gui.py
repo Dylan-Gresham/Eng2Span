@@ -16,7 +16,6 @@ class App(tk.Frame):
             print("english text entered:", text)
             print("trigger translation...")
             translated_text = text
-
             
             spanishText.config(state="normal") # unlock text box, must do before able to change things in it (people can type in it when unlocked)
             spanishText.delete("1.0", tk.END) # delete previous text
@@ -42,9 +41,31 @@ class App(tk.Frame):
         # setup tags for colored text
         palette = sns.color_palette("viridis_r", 10).as_hex()
         for ii in range(len(palette)):
-            # print(palette[ii])
             spanishText.tag_config(f"{ii}", foreground=palette[ii])
-        print("num colors:",len(palette))
+        # print("num colors:", len(palette))
+
+        # display the gradient
+        box_size = 30
+        padding = 10
+        label_width = 25
+        label_height = 10
+        canvas_width = len(palette) * box_size + label_width * 2 + padding * 2
+        canvas_height = box_size + label_height * 2
+        gradient = tk.Canvas(self, width=canvas_width, height=canvas_height)
+        gradient.pack(pady=10)#, fill="x", expand=True)
+    
+        for ii, color in enumerate(palette):
+            x0 = label_width + ii * box_size
+            y0 = label_height
+            x1 = label_width + (ii + 1) * box_size
+            y1 = label_height + box_size
+            gradient.create_rectangle(x0, y0, x1, y1, fill=color, outline="")
+    
+        # Position the "0%" label on the left side
+        gradient.create_text(label_width / 2 - padding, canvas_height / 2, text="0%", anchor=tk.W)
+    
+        # Position the "100%" label on the right side
+        gradient.create_text(2 * label_width + len(palette) * box_size + padding, canvas_height / 2, text="100%", anchor=tk.E)
         
         # how stuff will be layed out
         englishLabel.pack()
