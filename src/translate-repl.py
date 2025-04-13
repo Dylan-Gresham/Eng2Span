@@ -11,7 +11,9 @@ MODEL_REPO = "models/mbart"
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO, local_files_only=True).to(
     device
 )
+model.eval()
 tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer.src_lang = "en_XX"
 
 
 def translate_with_confidence(src_sentence: str):
@@ -20,16 +22,20 @@ def translate_with_confidence(src_sentence: str):
     """
     # Tokenize input
     inputs = tokenizer(src_sentence, return_tensors="pt").to(device)
+    forced_bos_token_id = tokenizer.lang_code_to_id["es_XX"]
 
     # Generate translation with scores
     with torch.no_grad():
         output = model.generate(
-            **inputs, return_dict_in_generate=True, output_scores=True
+            **inputs,
+            forced_bos_token_id=forced_bos_token_id,
+            return_dict_in_generate=True,
+            output_scores=True,
         )
 
     translated_tokens = output.sequences[0]
 
-    special_ids = tokenizer.all_special_ids
+    special_ids = set(tokenizer.all_special_ids)
     cleaned_ids = [id for id in translated_tokens.tolist() if id not in special_ids]
     decoded_tokens = tokenizer.convert_ids_to_tokens(cleaned_ids)
 
@@ -43,7 +49,7 @@ def translate_with_confidence(src_sentence: str):
 
         logits = output.scores[score_idx][0]
         probs = F.softmax(logits, dim=-1)
-        token_confidences.append(probs[id].item())
+        token_confidences.append(1.0 - probs[id].item())
         score_idx += 1
 
     # Merge subword tokens into full words with average confidence
