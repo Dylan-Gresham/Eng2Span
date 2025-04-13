@@ -55,15 +55,16 @@ def translate_with_confidence(src_sentence: str):
     # Merge subword tokens into full words with average confidence
     def merge_subword_scores(tokens, scores):
         words = []
+        confidences = []
         current_word = ""
         current_scores = []
 
         for token, score in zip(tokens, scores):
             if token.startswith("▁"):
                 if current_word:
-                    words.append(
-                        (current_word, sum(current_scores) / len(current_scores))
-                    )
+                    words.append(current_word)
+                    confidences.append(sum(current_scores) / len(current_scores))
+
                 current_word = token.lstrip("▁")
                 current_scores = [score]
             else:
@@ -71,8 +72,10 @@ def translate_with_confidence(src_sentence: str):
                 current_scores.append(score)
 
         if current_word:
-            words.append((current_word, sum(current_scores) / len(current_scores)))
-        return words
+            words.append(current_word)
+            confidences.append(sum(current_scores) / len(current_scores))
+
+        return words, confidences
 
     return merge_subword_scores(decoded_tokens, token_confidences)
 
@@ -82,4 +85,8 @@ if __name__ == "__main__":
         english = input("Enter English to translate: ")
         if english.lower() == "stop":
             break
-        pprint(translate_with_confidence(english))
+
+        # print(translate_with_confidence(english))
+        words, scores = translate_with_confidence(english)
+        for word, score in zip(words, scores):
+            print(f"{word} - {score*100.0:.4f}%")
