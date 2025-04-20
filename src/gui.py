@@ -31,7 +31,7 @@ class App(tk.Frame):
             # self.confidence_text = ""
             for word, score in zip(translated_text, translated_scores):
                 # print(f"{word} - {score}")
-                confidenceText.insert(tk.END, f"{word} - {score}\n")
+                confidenceText.insert(tk.END, f"{word} - {round(score,3)}\n")
                 # self.confidence_text += f"{word} - {score}\n"
             confidenceText.config(state="disabled")
             
