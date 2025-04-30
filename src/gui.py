@@ -1,9 +1,12 @@
 import tkinter as tk
 from tkinter import scrolledtext
+
 import seaborn as sns
 
 from src.translate_repl import translate_with_confidence
+
 # from translate_repl import translate_with_confidence # windows machine setting
+
 
 class App(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -24,7 +27,10 @@ class App(tk.Frame):
             print("translating...")
             translated_text, translated_scores = translate_with_confidence(text)
 
-            norm_scores = [min(int(score * (len(palette) - 1)), len(palette) - 1) for score in translated_scores]
+            norm_scores = [
+                min(int(score * (len(palette) - 1)), len(palette) - 1)
+                for score in translated_scores
+            ]
 
             confidenceText.config(state="normal")
             confidenceText.delete("1.0", tk.END)
@@ -34,8 +40,10 @@ class App(tk.Frame):
                 confidenceText.insert(tk.END, f"{word} - {round(score,3)}\n")
                 # self.confidence_text += f"{word} - {score}\n"
             confidenceText.config(state="disabled")
-            
-            spanishText.config(state="normal")  # unlock text box, must do before able to change things in it (people can type in it when unlocked)
+
+            spanishText.config(
+                state="normal"
+            )  # unlock text box, must do before able to change things in it (people can type in it when unlocked)
             spanishText.delete("1.0", tk.END)  # delete previous text
 
             for word, color_index in zip(translated_text, norm_scores):
@@ -49,17 +57,17 @@ class App(tk.Frame):
                 # confidenceText.insert(tk.END, self.confidence_text)
                 confidenceText.pack()
                 confidenceButton.config(text="Hide Confidence Scores")
-                self.is_displaying_confidence=True
+                self.is_displaying_confidence = True
             else:
                 # confidenceText.delete("1.0", tk.END)
                 confidenceText.pack_forget()
                 confidenceButton.config(text="Show Confidence Scores")
-                self.is_displaying_confidence=False
+                self.is_displaying_confidence = False
             confidenceText.config(state="disabled")
-        
+
         # components
         text_width = 50
-        text_height = 7 # in lines
+        text_height = 7  # in lines
         englishLabel = tk.Label(self, text="Enter English to translate:")
         spanishLabel = tk.Label(self, text="Spanish Translation:")
 
@@ -68,7 +76,7 @@ class App(tk.Frame):
 
         spanishText = tk.Text(self, width=text_width, height=text_height)
         spanishText.config(state="disabled")
-        
+
         # setup tags for colored text
         palette = sns.color_palette("viridis_r", 20).as_hex()
         for ii in range(len(palette)):
@@ -94,11 +102,18 @@ class App(tk.Frame):
             gradient.create_rectangle(x0, y0, x1, y1, fill=color, outline="")
 
         # Position the "0%" label on the left side
-        gradient.create_text(label_width / 2 - padding, canvas_height / 2, text="0%", anchor=tk.W)
+        gradient.create_text(
+            label_width / 2 - padding, canvas_height / 2, text="0%", anchor=tk.W
+        )
 
         # Position the "100%" label on the right side
-        gradient.create_text(2 * label_width + len(palette) * box_size + padding, canvas_height / 2, text="100%", anchor=tk.E)
-        
+        gradient.create_text(
+            2 * label_width + len(palette) * box_size + padding,
+            canvas_height / 2,
+            text="100%",
+            anchor=tk.E,
+        )
+
         # how stuff will be layed out
         englishLabel.pack()
         englishEntry.pack()
@@ -107,11 +122,16 @@ class App(tk.Frame):
         spanishText.pack()
 
         # show/hide confidence scores
-        confidenceButton = tk.Button(self, text="Show Confidence Scores", command=confidence_button)
+        confidenceButton = tk.Button(
+            self, text="Show Confidence Scores", command=confidence_button
+        )
         confidenceButton.pack(pady=10)
-        
-        confidenceText = scrolledtext.ScrolledText(self, wrap=tk.WORD, width=int(text_width*0.8), height=text_height)
+
+        confidenceText = scrolledtext.ScrolledText(
+            self, wrap=tk.WORD, width=int(text_width * 0.8), height=text_height
+        )
         # confidenceText.pack()S
+
 
 if __name__ == "__main__":
     root = tk.Tk()
