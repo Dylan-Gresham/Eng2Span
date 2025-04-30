@@ -1,16 +1,20 @@
+from pprint import pprint
+
 import torch
 import torch.nn.functional as F
-from transformers import AutoModelForSeq2SeqLM, MBartTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 MODEL_REPO = "dmidge/mbart-large-50-eng2span"
+TOKENIZER_REPO = "facebook/mbart-large-50"
 
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO).to(device)
-model.eval()
-tokenizer = MBartTokenizer.from_pretrained(
-    "facebook/mbart-large-50", src_lang="en_XX", tgt_lang="es_XX"
+model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO).to(
+    device
 )
+model.eval()
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_REPO)
+tokenizer.src_lang = "en_XX"
 
 
 def translate_with_confidence(src_sentence: str):
@@ -40,7 +44,7 @@ def translate_with_confidence(src_sentence: str):
     token_confidences = []
     score_idx = 0
 
-    for _, id in enumerate(translated_tokens[1:]):
+    for i, id in enumerate(translated_tokens[1:]):
         if id.item() in special_ids:
             continue
 
@@ -83,6 +87,7 @@ if __name__ == "__main__":
         if english.lower() == "stop":
             break
 
+        # print(translate_with_confidence(english))
         words, scores = translate_with_confidence(english)
         for word, score in zip(words, scores):
             print(f"{word} - {score*100.0:.4f}%")
