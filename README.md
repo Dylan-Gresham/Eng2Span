@@ -10,7 +10,7 @@ An English to Spanish translation project for CS 436/536 Natural Language Proces
 
 Eng2Span is a neural machine translation application designed to translate English text into Spanish text and enhance the translated text with word-level confidence scoring. Unlike traditional translation tools, Eng2Span aims not only to generate accurate translations, but also to enhance the user's understanding by indicating the model’s certainty for each translated word. This application enables users to input English text, view the Spanish translation, and assess confidence scores for the translation. The confidence score feedback allows users to identify potentially unreliable translation segments, promoting more informed and effective communication in bilingual contexts. 
 
-This application was built on Python, using libraries and resources such as TensorFlow, HuggingFace, pandas, and Tkinter.
+This application was built on Python, using libraries and resources such as PyTorch, HuggingFace, Transformers, pandas, and Tkinter.
 
 ## Getting Started
 
