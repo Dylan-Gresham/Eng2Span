@@ -6,13 +6,14 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-MODEL_REPO = "models/mbart"
+MODEL_REPO = "dmidge/mbart-large-50-eng2span"
+TOKENIZER_REPO = "facebook/mbart-large-50"
 
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO, local_files_only=True).to(
+model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO).to(
     device
 )
 model.eval()
-tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_REPO)
 tokenizer.src_lang = "en_XX"
 
 
